@@ -1,26 +1,430 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ————————————————————————————————————————————
+   Kaua's  -Mac-inspired premium design tokens
+   shadcn/ui “Orange” palette · new-york style
+————————————————————————————————————————————-*/
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* shadcn orange -light */
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+
+  --card: oklch(1 0 0 / 0.72);
+  --card-foreground: oklch(0.145 0 0);
+
+  --popover: oklch(1 0 0 / 0.92);
+  --popover-foreground: oklch(0.145 0 0);
+
+  --primary: oklch(0.705 0.213 47.604);
+  --primary-foreground: oklch(0.98 0.016 73.684);
+
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+
+  --accent: oklch(0.97 0.02 60);
+  --accent-foreground: oklch(0.205 0.01 60);
+
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.98 0.016 73.684);
+
+  --border: oklch(0.922 0 0 / 0.8);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.705 0.213 47.604 / 0.55);
+
+  --radius: 14px;
+
+  /* Mobile chrome heights */
+  --header-h: 56px;
+  --bottom-nav-h: 64px;
+
+  /* Warm orange / amber signature glow */
+  --mac-glow: radial-gradient(
+      circle at 10% 0%,
+      oklch(0.88 0.16 60 / 0.55),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      oklch(0.85 0.2 45 / 0.55),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      oklch(0.9 0.14 80 / 0.4),
+      transparent 55%
+    );
+}
+
+.dark {
+  /* shadcn orange -dark */
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+
+  --card: oklch(0.205 0.005 60 / 0.7);
+  --card-foreground: oklch(0.985 0 0);
+
+  --popover: oklch(0.205 0.005 60 / 0.92);
+  --popover-foreground: oklch(0.985 0 0);
+
+  --primary: oklch(0.646 0.222 41.116);
+  --primary-foreground: oklch(0.98 0.016 73.684);
+
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+
+  --accent: oklch(0.269 0.02 60);
+  --accent-foreground: oklch(0.985 0 0);
+
+  --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: oklch(0.98 0.016 73.684);
+
+  --border: oklch(1 0 0 / 0.1);
+  --input: oklch(1 0 0 / 0.15);
+  --ring: oklch(0.646 0.222 41.116 / 0.55);
+
+  --mac-glow: radial-gradient(
+      circle at 10% 0%,
+      oklch(0.55 0.22 60 / 0.35),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      oklch(0.52 0.2 45 / 0.4),
+      transparent 45%
+    ),
+    radial-gradient(
+      circle at 50% 100%,
+      oklch(0.55 0.18 80 / 0.3),
+      transparent 55%
+    );
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-sans), -apple-system, BlinkMacSystemFont, "SF Pro Display",
+    "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  --font-display-family: var(--font-display), "Bodoni Moda", "Playfair Display", "Times New Roman", serif;
+  --font-mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 6px);
+
+  --animate-fade-up: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    overscroll-behavior-y: contain;
+  }
+
+  /* Prevent iOS auto-zoom on input focus by ensuring 16px minimum */
+  @media (max-width: 767px) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
+  }
+
+  ::selection {
+    background: oklch(from var(--primary) l c h / 0.3);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display-family);
+  }
+
+  /* Frosted, macOS-style vibrancy panel */
+  .glass {
+    background: color-mix(in oklch, var(--card) 85%, transparent);
+    backdrop-filter: saturate(180%) blur(28px);
+    -webkit-backdrop-filter: saturate(180%) blur(28px);
+    border: 1px solid color-mix(in oklch, var(--foreground) 5%, transparent);
+    box-shadow:
+      0 12px 32px -12px rgba(0, 0, 0, 0.18),
+      0 2px 8px -2px rgba(0, 0, 0, 0.08);
+  }
+
+  .dark .glass {
+    background: color-mix(in oklch, var(--card) 65%, transparent);
+    box-shadow:
+      0 16px 40px -16px rgba(0, 0, 0, 0.5),
+      0 2px 8px -2px rgba(0, 0, 0, 0.4);
+  }
+
+  .glass-strong {
+    background: color-mix(in oklch, var(--card) 96%, transparent);
+    backdrop-filter: saturate(200%) blur(40px);
+    -webkit-backdrop-filter: saturate(200%) blur(40px);
+    border: 1px solid color-mix(in oklch, var(--foreground) 10%, transparent);
+  }
+
+  .mac-glow {
+    background-image: var(--mac-glow);
+  }
+
+  .mac-card {
+    position: relative;
+    isolation: isolate;
+    background: color-mix(in oklch, var(--card) 90%, transparent);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    border: 1px solid color-mix(in oklch, var(--foreground) 7%, transparent);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, white 70%, transparent),
+      0 10px 30px -18px rgba(0, 0, 0, 0.35);
+    transition:
+      transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+      box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .mac-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background-image:
+      radial-gradient(circle at 20% 20%, oklch(0.82 0.09 72 / 0.16), transparent 55%),
+      radial-gradient(circle at 80% 35%, oklch(0.74 0.12 45 / 0.12), transparent 50%),
+      radial-gradient(circle at 50% 90%, oklch(0.88 0.07 85 / 0.1), transparent 50%);
+  }
+
+  .mac-card:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 color-mix(in oklch, white 70%, transparent),
+      0 24px 48px -18px rgba(0, 0, 0, 0.28);
+  }
+
+  .mac-card:hover::before {
+    opacity: 1;
+  }
+
+  .dark .mac-card {
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 12px 30px -18px rgba(0, 0, 0, 0.7);
+  }
+
+  /* Warm orange brand gradient helper */
+  .brand-gradient {
+    background-image: linear-gradient(
+      135deg,
+      oklch(0.78 0.18 75) 0%,
+      oklch(0.7 0.21 55) 45%,
+      oklch(0.62 0.24 35) 100%
+    );
+  }
+
+  .brand-text-gradient {
+    background-image: linear-gradient(
+      135deg,
+      oklch(0.78 0.18 75),
+      oklch(0.68 0.23 45),
+      oklch(0.6 0.25 28)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .noise {
+    position: relative;
+  }
+  .noise::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.9'/></svg>");
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  /* Safe-area helpers for iOS notches and home indicator */
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-x {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+
+  /* Reserve space for the mobile bottom tab bar so content never sits under it */
+  .pb-tabbar {
+    padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom));
+  }
+  @media (min-width: 768px) {
+    .pb-tabbar {
+      padding-bottom: 0;
+    }
+  }
+
+  /* Touch-action helpers */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
+  .touch-pan-y {
+    touch-action: pan-y;
+  }
+  .touch-pinch-zoom {
+    touch-action: pinch-zoom;
+  }
+
+  /* Use dynamic viewport height (resilient to iOS URL bar collapse) */
+  .min-h-dvh {
+    min-height: 100dvh;
+  }
+  .h-dvh {
+    height: 100dvh;
+  }
 }
+
+/* Sonner toast tokens -aligned with app palette (light + dark) */
+[data-sonner-toaster] {
+  --normal-bg: var(--popover);
+  --normal-text: var(--popover-foreground);
+  --normal-border: var(--border);
+
+  --success-bg: var(--popover);
+  --success-text: var(--popover-foreground);
+  --success-border: var(--border);
+
+  --error-bg: var(--popover);
+  --error-text: var(--popover-foreground);
+  --error-border: var(--border);
+
+  --info-bg: var(--popover);
+  --info-text: var(--popover-foreground);
+  --info-border: var(--border);
+
+  --warning-bg: var(--popover);
+  --warning-text: var(--popover-foreground);
+  --warning-border: var(--border);
+
+  --loading-bg: var(--popover);
+  --loading-text: var(--popover-foreground);
+  --loading-border: var(--border);
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-description] {
+  color: var(--muted-foreground);
+  opacity: 1;
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-title] {
+  color: var(--foreground);
+}
+
+[data-sonner-toaster] [data-sonner-toast] [data-icon] {
+  color: var(--primary);
+}
+
+/* Clerk watermark/footer removal on auth cards */
+.cl-footer,
+.cl-footerAction {
+  display: none !important;
+}
+
+.cl-internal-1scq7x4{
+  display: none !important;
+}
+.cl-internal-1fpq5at {
+  display: none !important;
+}
+.cl-internal-1fpq5at {
+  display: none !important;}
+  .cl-internal-l2l775{
+    display: none !important;
+  }
+  .cl-internal-l2l775{
+    display: none !important;
+  }
+  .cl-internal-l2l775{
+    display: none !important;
+  }
+  .cl-internal-l2l775{
+    display: none !important;
+  }

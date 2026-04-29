@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kaua's 
 
-## Getting Started
+A **private family photo library** with a premium Mac-inspired design.
+Built with **Next.js 16 · React 19 · Tailwind 4 · shadcn/ui · Clerk · Sanity**,
+laid out as a **Pinterest-style masonry gallery**.
 
-First, run the development server:
+## ✨ Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- 🖼️ **Pinterest masonry** gallery that keeps every photo looking its best
+- 💎 **Mac-inspired UI** -frosted glass panels, soft shadows, ambient gradients
+- 🔐 **Clerk** authentication, route-protected via middleware
+- 📦 **Sanity** CMS for photos, albums and family members (with a mock fallback so the UI works out of the box)
+- 🧩 **Component-based architecture** with `components/ui` (shadcn primitives), `components/layout`, `components/gallery`, `components/home`
+- 🌗 **Light & dark mode** via CSS variables
+- 🎨 Custom design tokens in `app/globals.css`
+
+## 🗂 Project layout
+
+```
+app/
+  layout.tsx              # Clerk provider, fonts, toaster, global gradient
+  page.tsx                # Landing + "Family wall" masonry preview
+  gallery/page.tsx        # Full masonry gallery
+  albums/page.tsx         # Album index
+  albums/[slug]/page.tsx  # Album detail
+  family/page.tsx         # Invited members
+  upload/page.tsx         # Upload flow
+  sign-in/[[...]]/page.tsx
+  sign-up/[[...]]/page.tsx
+
+components/
+  ui/          # shadcn primitives (button, card, dialog, dropdown…)
+  layout/      # Navbar, Sidebar, Footer, Logo
+  gallery/    # PhotoCard, MasonryGrid, PhotoLightbox, AlbumCard, UploadDialog
+  home/        # Hero, FeatureGrid
+
+lib/
+  utils.ts     # cn() + formatDate()
+  data.ts      # Sanity → mock data fallback
+  mock-data.ts # Curated Unsplash placeholders
+
+sanity/
+  client.ts    # Sanity client + image URL builder
+  env.ts
+  queries.ts   # GROQ queries + TS types
+  schemas/     # photo, album, familyMember
+
+middleware.ts  # Clerk route protection
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+cp .env.example .env.local
+pnpm dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open <http://localhost:3000> -without any keys it runs with **built-in mock photos** so you can explore the whole UI.
 
-## Learn More
+## 🔐 Clerk setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Create a project at <https://clerk.com>.
+2. Copy the keys into `.env.local`:
+   ```
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_…
+   CLERK_SECRET_KEY=sk_test_…
+   ```
+3. Routes under `/gallery`, `/albums`, `/family`, `/favorites`, `/highlights`, `/upload` are automatically protected by `middleware.ts`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📦 Sanity setup
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Create a project at <https://sanity.io/manage>.
+2. Add to `.env.local`:
+   ```
+   NEXT_PUBLIC_SANITY_PROJECT_ID=…
+   NEXT_PUBLIC_SANITY_DATASET=production
+   ```
+3. Bootstrap the schemas (from `sanity/schemas/`) in your own Sanity Studio, or drop them into a local studio project.
 
-## Deploy on Vercel
+The app reads through `lib/data.ts`, which falls back to curated mock data whenever Sanity isn’t configured -so the UI stays beautiful during development.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🧩 Adding new shadcn primitives
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The project is compatible with the shadcn CLI (`components.json` is present). Run:
+
+```bash
+pnpm dlx shadcn@latest add <component>
+```
+
+New primitives land in `components/ui` and inherit the custom Mac-style tokens defined in `app/globals.css`.
+
+## 🛠 Scripts
+
+```bash
+pnpm dev     # Next.js dev server (Turbopack)
+pnpm build   # Production build
+pnpm start   # Production server
+pnpm lint    # ESLint
+```
+
+## License
+
+MIT -make it your own.
