@@ -4,8 +4,6 @@ import { auth } from "@clerk/nextjs/server";
 
 import { getSanityWriteClient } from "@/sanity/write-client";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 export async function PATCH(req: Request) {
   const { userId } = await auth();

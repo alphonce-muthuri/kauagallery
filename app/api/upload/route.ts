@@ -4,8 +4,6 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 
 import { getSanityWriteClient } from "@/sanity/write-client";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 const MAX_BYTES = 25 * 1024 * 1024; // 25 MB
 const ALLOWED_TYPES = new Set([

@@ -6,8 +6,6 @@ import { getSanityClient } from "@/sanity/client";
 import { getSanityWriteClient } from "@/sanity/write-client";
 import { familyMembersQuery, type FamilyMember } from "@/sanity/queries";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
 
 export async function GET() {
   const client = getSanityClient();

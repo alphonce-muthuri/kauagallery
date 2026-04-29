@@ -1,25 +1,67 @@
+"use client";
+
 import Link from "next/link";
 import { Logo } from "./logo";
 
+const NAV_LINKS = [
+  { href: "/gallery",    label: "Gallery"    },
+  { href: "/albums",     label: "Albums"     },
+  { href: "/highlights", label: "Highlights" },
+  { href: "/favorites",  label: "Favorites"  },
+  { href: "/family",     label: "Family"     },
+  { href: "/upload",     label: "Upload"     },
+];
+
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-border/60 bg-background/60 backdrop-blur-md">
-      <div className="mx-auto flex max-w-[1400px] flex-col items-start justify-between gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center">
-        <div className="flex flex-col gap-2">
-          <Logo />
-          <p className="text-xs text-muted-foreground">
-            The Kaua family -rooted in faith, rich in love.
+    <footer className="relative mt-24 overflow-hidden bg-[#0a0a0a]">
+      {/* subtle warm glow at the top edge */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-orange-500/40 to-transparent"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 h-56 w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-orange-500/5 blur-3xl"
+      />
+
+      <div className="relative mx-auto max-w-[1400px] px-6 py-14 sm:px-8">
+        {/* top row */}
+        <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+          {/* brand */}
+          <div className="flex flex-col gap-3 max-w-xs">
+            <Logo className="text-white [&_span:last-child]:text-white" />
+            <p className="text-[13px] leading-relaxed text-white/40">
+              A private sanctuary for the Kaua family - rooted in faith, rich in love.
+            </p>
+          </div>
+
+          {/* nav */}
+          <nav className="flex flex-wrap gap-x-8 gap-y-3 md:justify-end">
+            {NAV_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className="text-[13px] font-medium text-white/40 transition-colors duration-150 hover:text-white/90"
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        {/* divider */}
+        <div className="my-10 h-px bg-white/[0.06]" />
+
+        {/* bottom row */}
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[12px] text-white/25">
+            © {new Date().getFullYear()} Kaua Family · All rights reserved.
+          </p>
+          <p className="text-[12px] text-white/25 italic">
+            God is good, all the time.
           </p>
         </div>
-        <nav className="flex flex-wrap items-center gap-5 text-sm text-muted-foreground">
-          <Link href="/gallery" className="hover:text-foreground">Gallery</Link>
-          <Link href="/albums" className="hover:text-foreground">Albums</Link>
-          <Link href="/family" className="hover:text-foreground">Family</Link>
-          <Link href="/upload" className="hover:text-foreground">Upload</Link>
-        </nav>
-        <p className="text-xs text-muted-foreground">
-          © {new Date().getFullYear()} Kaua Family · God is good, all the time.
-        </p>
       </div>
     </footer>
   );
