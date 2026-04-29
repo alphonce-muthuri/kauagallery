@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import { cacheLife } from "next/cache";
 import { Logo } from "./logo";
 
 const NAV_LINKS = [
@@ -12,7 +11,9 @@ const NAV_LINKS = [
   { href: "/upload",     label: "Upload"     },
 ];
 
-export function Footer() {
+export async function Footer() {
+  "use cache";
+  cacheLife("max");
   return (
     <footer className="relative mt-24 overflow-hidden bg-[#0a0a0a]">
       {/* subtle warm glow at the top edge */}

@@ -48,7 +48,7 @@ export async function DELETE(req: Request) {
     }
   }
 
-  revalidateTag("photos");
+  revalidateTag("photos", "default");
   revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath("/albums");

@@ -33,8 +33,41 @@ export const photosQuery = groq`
   }
 `;
 
+export const photosCountQuery = groq`count(*[_type == "photo"])`;
+
+export const paginatedPhotosQuery = groq`
+  *[_type == "photo"] | order(takenAt desc, _createdAt desc) [$start...$end] {
+    _id,
+    title,
+    caption,
+    takenAt,
+    "imageUrl": image.asset->url,
+    "dimensions": image.asset->metadata.dimensions,
+    "lqip": image.asset->metadata.lqip,
+    "album": album->{ _id, title, slug },
+    ${uploaderProjection},
+    tags
+  }
+`;
+
 export const albumsQuery = groq`
   *[_type == "album"] | order(_createdAt desc) {
+    _id,
+    title,
+    description,
+    "slug": slug.current,
+    "coverUrl": select(
+      defined(cover.asset) => cover.asset->url,
+      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].image.asset->url
+    ),
+    "photoCount": count(*[_type == "photo" && references(^._id)])
+  }
+`;
+
+export const albumsCountQuery = groq`count(*[_type == "album"])`;
+
+export const paginatedAlbumsQuery = groq`
+  *[_type == "album"] | order(_createdAt desc) [$start...$end] {
     _id,
     title,
     description,

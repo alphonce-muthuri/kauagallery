@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     ...(avatarUrl ? { avatarUrl } : {}),
   });
 
-  revalidateTag("family-members");
+  revalidateTag("family-members", "default");
   revalidatePath("/family");
   return NextResponse.json({ member: created }, { status: 201 });
 }
@@ -96,7 +96,7 @@ export async function PATCH(req: Request) {
   if (unsetFields.length > 0) patch = patch.unset(unsetFields);
   const updated = await patch.commit();
 
-  revalidateTag("family-members");
+  revalidateTag("family-members", "default");
   revalidatePath("/family");
   return NextResponse.json({ member: updated });
 }

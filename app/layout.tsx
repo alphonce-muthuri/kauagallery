@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Bodoni_Moda, Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
 
 import { ServiceWorkerRegistrar } from "@/components/pwa/service-worker-registrar";
 import { PullToRefresh } from "@/components/pwa/pull-to-refresh";
@@ -92,11 +93,19 @@ export default function RootLayout({
       >
         <body className="min-h-full flex flex-col bg-background text-foreground pb-tabbar">
           <div className="pointer-events-none fixed inset-0 -z-10 mac-glow" />
-          <PullToRefresh />
+          <Suspense fallback={null}>
+            <PullToRefresh />
+          </Suspense>
           {children}
-          <MobileTabBar />
-          <UploadDialog />
-          <InstallPrompt />
+          <Suspense fallback={null}>
+            <MobileTabBar />
+          </Suspense>
+          <Suspense fallback={null}>
+            <UploadDialog />
+          </Suspense>
+          <Suspense fallback={null}>
+            <InstallPrompt />
+          </Suspense>
           <ServiceWorkerRegistrar />
           <Toaster
             position="bottom-right"

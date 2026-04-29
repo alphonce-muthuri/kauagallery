@@ -152,8 +152,8 @@ export async function POST(req: Request) {
     });
 
     /* 8 -Refresh cached gallery routes so the new photo shows up immediately. */
-    revalidateTag("photos");
-    revalidateTag("albums");
+    revalidateTag("photos", "default");
+    revalidateTag("albums", "default");
     revalidatePath("/");
     revalidatePath("/gallery");
     revalidatePath("/albums");

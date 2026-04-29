@@ -23,9 +23,16 @@ export function PhotoCard({ photo, priority, onOpen, onSetAsCover }: PhotoCardPr
   const aspect = photo.dimensions?.aspectRatio || 1;
 
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => {
+        haptics.tap();
+        onOpen();
+      }}
+      onKeyDown={(e) => {
+        if (e.key !== "Enter" && e.key !== " ") return;
+        e.preventDefault();
         haptics.tap();
         onOpen();
       }}
@@ -35,7 +42,7 @@ export function PhotoCard({ photo, priority, onOpen, onSetAsCover }: PhotoCardPr
         "transition-transform duration-500 ease-[cubic-bezier(0.2,0.8,0.2,1)]",
         "hover:-translate-y-0.5 active:scale-[0.99]",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-        "touch-manipulation"
+        "touch-manipulation cursor-pointer"
       )}
       style={{ aspectRatio: aspect }}
     >
@@ -120,6 +127,6 @@ export function PhotoCard({ photo, priority, onOpen, onSetAsCover }: PhotoCardPr
           <span>Set cover</span>
         </button>
       )}
-    </button>
+    </div>
   );
 }

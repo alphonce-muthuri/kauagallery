@@ -48,9 +48,9 @@ export async function DELETE(req: Request) {
   tx = tx.delete(albumId);
   await tx.commit();
 
-  revalidateTag("albums");
-  revalidateTag("photos");
-  if (album.slug) revalidateTag(`album-${album.slug}`);
+  revalidateTag("albums", "default");
+  revalidateTag("photos", "default");
+  if (album.slug) revalidateTag(`album-${album.slug}`, "default");
   revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath("/albums");

@@ -2,15 +2,25 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Menu, Search, Upload } from "lucide-react";
-import { Show, UserButton } from "@clerk/nextjs";
-
+import dynamic from "next/dynamic";
+import { Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Logo } from "./logo";
-import { MobileDrawer } from "./mobile-drawer";
-import { MobileSearchSheet } from "./mobile-search-sheet";
+
+const MobileDrawer = dynamic(
+  () => import("./mobile-drawer").then((m) => ({ default: m.MobileDrawer })),
+  { ssr: false }
+);
+const MobileSearchSheet = dynamic(
+  () => import("./mobile-search-sheet").then((m) => ({ default: m.MobileSearchSheet })),
+  { ssr: false }
+);
+const NavbarAuth = dynamic(
+  () => import("./navbar-auth").then((m) => ({ default: m.NavbarAuth })),
+  { ssr: false }
+);
 
 export function Navbar() {
   const [hidden, setHidden] = useState(false);
@@ -110,33 +120,7 @@ export function Navbar() {
                 <Search className="size-5" />
               </button>
 
-              <Show when="signed-in">
-                <Button asChild size="sm" className="hidden sm:inline-flex">
-                  <Link href="/upload">
-                    <Upload className="size-4" />
-                    Upload
-                  </Link>
-                </Button>
-                <div className="ml-1">
-                  <UserButton
-                    appearance={{
-                      elements: {
-                        avatarBox:
-                          "size-9 ring-2 ring-background shadow-sm rounded-full",
-                      },
-                    }}
-                  />
-                </div>
-              </Show>
-
-              <Show when="signed-out">
-                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                  <Link href="/sign-in">Sign in</Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/sign-up">Get started</Link>
-                </Button>
-              </Show>
+              <NavbarAuth />
             </div>
           </div>
         </div>

@@ -63,8 +63,8 @@ export async function PATCH(req: Request) {
   if (unsetFields.length > 0) p = p.unset(unsetFields);
   await p.commit();
 
-  revalidateTag("albums");
-  if (album.slug) revalidateTag(`album-${album.slug}`);
+  revalidateTag("albums", "default");
+  if (album.slug) revalidateTag(`album-${album.slug}`, "default");
   revalidatePath("/");
   revalidatePath("/albums");
   if (album.slug) revalidatePath(`/albums/${album.slug}`, "page");

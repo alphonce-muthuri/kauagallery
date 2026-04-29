@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { SignIn } from "@clerk/nextjs";
 import { Logo } from "@/components/layout/logo";
 
@@ -15,6 +16,7 @@ export default function SignInPage() {
           </p>
         </div>
         <div className="flex justify-center">
+          <Suspense fallback={null}>
           <SignIn
             appearance={{
               elements: {
@@ -25,6 +27,7 @@ export default function SignInPage() {
               },
             }}
           />
+          </Suspense>
         </div>
       </div>
     </main>

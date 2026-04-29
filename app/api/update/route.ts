@@ -68,7 +68,7 @@ export async function PATCH(req: Request) {
   if (unsetFields.length > 0) p = p.unset(unsetFields);
   await p.commit();
 
-  revalidateTag("photos");
+  revalidateTag("photos", "default");
   revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath("/albums");
