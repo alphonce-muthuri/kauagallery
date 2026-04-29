@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 
 import { getSanityClient } from "@/sanity/client";
@@ -48,6 +48,7 @@ export async function POST(req: Request) {
     ...(avatarUrl ? { avatarUrl } : {}),
   });
 
+  revalidateTag("family-members");
   revalidatePath("/family");
   return NextResponse.json({ member: created }, { status: 201 });
 }
@@ -97,6 +98,7 @@ export async function PATCH(req: Request) {
   if (unsetFields.length > 0) patch = patch.unset(unsetFields);
   const updated = await patch.commit();
 
+  revalidateTag("family-members");
   revalidatePath("/family");
   return NextResponse.json({ member: updated });
 }

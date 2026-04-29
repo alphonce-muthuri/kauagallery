@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 
 import { getSanityWriteClient } from "@/sanity/write-client";
@@ -24,8 +24,8 @@ export async function PATCH(req: Request) {
     return NextResponse.json({ error: "Sanity not configured." }, { status: 500 });
   }
 
-  const album = await client.fetch<{ _id: string } | null>(
-    `*[_type == "album" && _id == $id][0]{ _id }`,
+  const album = await client.fetch<{ _id: string; slug?: string } | null>(
+    `*[_type == "album" && _id == $id][0]{ _id, "slug": slug.current }`,
     { id: albumId }
   );
   if (!album) {
@@ -65,9 +65,11 @@ export async function PATCH(req: Request) {
   if (unsetFields.length > 0) p = p.unset(unsetFields);
   await p.commit();
 
+  revalidateTag("albums");
+  if (album.slug) revalidateTag(`album-${album.slug}`);
   revalidatePath("/");
   revalidatePath("/albums");
-  revalidatePath(`/albums/${albumId}`, "page");
+  if (album.slug) revalidatePath(`/albums/${album.slug}`, "page");
 
   return NextResponse.json({ ok: true });
 }

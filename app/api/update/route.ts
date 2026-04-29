@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 
 import { getSanityWriteClient } from "@/sanity/write-client";
@@ -70,6 +70,7 @@ export async function PATCH(req: Request) {
   if (unsetFields.length > 0) p = p.unset(unsetFields);
   await p.commit();
 
+  revalidateTag("photos");
   revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath("/albums");

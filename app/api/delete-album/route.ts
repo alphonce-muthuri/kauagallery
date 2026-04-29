@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 
 import { getSanityWriteClient } from "@/sanity/write-client";
@@ -50,6 +50,9 @@ export async function DELETE(req: Request) {
   tx = tx.delete(albumId);
   await tx.commit();
 
+  revalidateTag("albums");
+  revalidateTag("photos");
+  if (album.slug) revalidateTag(`album-${album.slug}`);
   revalidatePath("/");
   revalidatePath("/gallery");
   revalidatePath("/albums");

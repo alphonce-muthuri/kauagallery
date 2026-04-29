@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 import { getSanityWriteClient } from "@/sanity/write-client";
@@ -154,6 +154,8 @@ export async function POST(req: Request) {
     });
 
     /* 8 -Refresh cached gallery routes so the new photo shows up immediately. */
+    revalidateTag("photos");
+    revalidateTag("albums");
     revalidatePath("/");
     revalidatePath("/gallery");
     revalidatePath("/albums");
