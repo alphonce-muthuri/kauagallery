@@ -1,4 +1,4 @@
-import { Filter, SlidersHorizontal } from "lucide-react";
+import { Search } from "lucide-react";
 import { Suspense } from "react";
 
 import { Navbar } from "@/components/layout/navbar";
@@ -7,8 +7,8 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { MasonryGrid } from "@/components/gallery/masonry-grid";
 import { OpenUploadButton } from "@/components/gallery/open-upload-button";
 import { PaginationControls } from "@/components/ui/pagination-controls";
-import { Button } from "@/components/ui/button";
-import { getPhotosPaginated } from "@/lib/data";
+import { GalleryFilters } from "@/components/gallery/gallery-filters";
+import { getPhotosFiltered, getAlbums } from "@/lib/data";
 
 const PAGE_SIZE = 24;
 
@@ -17,10 +17,14 @@ function parsePage(page?: string) {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
+function parseSort(sort?: string): "asc" | "desc" {
+  return sort === "asc" ? "asc" : "desc";
+}
+
 export default async function GalleryPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; sort?: string; album?: string }>;
 }) {
   return (
     <>
@@ -46,12 +50,26 @@ export default async function GalleryPage({
 async function GalleryContent({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{ page?: string; q?: string; sort?: string; album?: string }>;
 }) {
-  const { page } = await searchParams;
+  const { page, q, sort, album } = await searchParams;
   const currentPage = parsePage(page);
-  const pagination = await getPhotosPaginated(currentPage, PAGE_SIZE);
+  const sortOrder = parseSort(sort);
+  const query = q?.trim() ?? "";
+  const albumSlug = album ?? "";
+
+  const [pagination, albums] = await Promise.all([
+    getPhotosFiltered(currentPage, PAGE_SIZE, { q: query, albumSlug, sort: sortOrder }),
+    getAlbums(),
+  ]);
+
   const photos = pagination.items;
+  const isSearching = query.length > 0;
+
+  const extraParams: Record<string, string> = {};
+  if (query) extraParams.q = query;
+  if (albumSlug) extraParams.album = albumSlug;
+  if (sortOrder !== "desc") extraParams.sort = sortOrder;
 
   return (
     <section className="flex-1 min-w-0">
@@ -61,31 +79,46 @@ async function GalleryContent({
             Gallery
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight sm:text-4xl">
-            All family memories
+            {isSearching ? `Results for "${query}"` : "All family memories"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {pagination.total} photos across every album and person.
+            {pagination.total} {pagination.total === 1 ? "photo" : "photos"}
+            {isSearching ? " found" : " across every album and person"}.
           </p>
         </div>
         <div className="-mx-1 flex items-center gap-2 overflow-x-auto px-1 scrollbar-none">
-          <Button variant="outline" size="sm" className="shrink-0">
-            <Filter className="size-4" /> Filter
-          </Button>
-          <Button variant="outline" size="sm" className="shrink-0">
-            <SlidersHorizontal className="size-4" /> Sort
-          </Button>
+          <Suspense>
+            <GalleryFilters albums={albums} />
+          </Suspense>
           <div className="hidden sm:block">
             <OpenUploadButton />
           </div>
         </div>
       </div>
 
-      <MasonryGrid photos={photos} />
-      <PaginationControls
-        basePath="/gallery"
-        currentPage={pagination.currentPage}
-        totalPages={pagination.totalPages}
-      />
+      {photos.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <Search className="mb-4 size-12 text-muted-foreground/40" />
+          <p className="text-lg font-medium">
+            {isSearching ? "No photos found" : "No photos yet"}
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {isSearching
+              ? "Try a different search term or clear the filters."
+              : "Upload your first memory to get started."}
+          </p>
+        </div>
+      ) : (
+        <>
+          <MasonryGrid photos={photos} />
+          <PaginationControls
+            basePath="/gallery"
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            extraParams={extraParams}
+          />
+        </>
+      )}
     </section>
   );
 }

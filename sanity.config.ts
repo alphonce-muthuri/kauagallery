@@ -1,0 +1,14 @@
+import { defineConfig } from "sanity";
+import { structureTool } from "sanity/structure";
+
+import { schemaTypes } from "@/sanity/schemas";
+import { apiVersion, dataset, projectId } from "@/sanity/env";
+
+export default defineConfig({
+  basePath: "/studio",
+  projectId,
+  dataset,
+  apiVersion,
+  plugins: [structureTool()],
+  schema: { types: schemaTypes },
+});

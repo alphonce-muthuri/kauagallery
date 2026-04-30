@@ -22,7 +22,18 @@ export const photo: SchemaTypeDefinition = {
       title: "Image",
       type: "image",
       options: { hotspot: true, metadata: ["dimensions", "lqip", "palette"] },
-      validation: (Rule) => Rule.required(),
+      validation: (Rule) =>
+        Rule.custom((value, ctx) => {
+          const doc = ctx.document as Record<string, unknown> | undefined;
+          if (!value && !doc?.externalImageUrl) return "Upload an image or provide an External Image URL";
+          return true;
+        }),
+    },
+    {
+      name: "externalImageUrl",
+      title: "External Image URL",
+      description: "Use instead of uploading — e.g. a Google Drive direct link",
+      type: "url",
     },
     {
       name: "album",
@@ -66,6 +77,12 @@ export const photo: SchemaTypeDefinition = {
       title: "Uploader (reference · optional)",
       type: "reference",
       to: [{ type: "familyMember" }],
+    },
+    {
+      name: "featuredInHero",
+      title: "Feature in hero slideshow",
+      type: "boolean",
+      initialValue: false,
     },
   ],
   preview: {

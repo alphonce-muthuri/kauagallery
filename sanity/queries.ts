@@ -24,7 +24,7 @@ export const photosQuery = groq`
     title,
     caption,
     takenAt,
-    "imageUrl": image.asset->url,
+    "imageUrl": coalesce(image.asset->url, externalImageUrl),
     "dimensions": image.asset->metadata.dimensions,
     "lqip": image.asset->metadata.lqip,
     "album": album->{ _id, title, slug },
@@ -41,7 +41,7 @@ export const paginatedPhotosQuery = groq`
     title,
     caption,
     takenAt,
-    "imageUrl": image.asset->url,
+    "imageUrl": coalesce(image.asset->url, externalImageUrl),
     "dimensions": image.asset->metadata.dimensions,
     "lqip": image.asset->metadata.lqip,
     "album": album->{ _id, title, slug },
@@ -56,9 +56,10 @@ export const albumsQuery = groq`
     title,
     description,
     "slug": slug.current,
-    "coverUrl": select(
-      defined(cover.asset) => cover.asset->url,
-      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].image.asset->url
+    "coverUrl": coalesce(
+      cover.asset->url,
+      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].image.asset->url,
+      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].externalImageUrl
     ),
     "photoCount": count(*[_type == "photo" && references(^._id)])
   }
@@ -72,9 +73,10 @@ export const paginatedAlbumsQuery = groq`
     title,
     description,
     "slug": slug.current,
-    "coverUrl": select(
-      defined(cover.asset) => cover.asset->url,
-      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].image.asset->url
+    "coverUrl": coalesce(
+      cover.asset->url,
+      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].image.asset->url,
+      *[_type == "photo" && references(^._id)] | order(_createdAt desc)[0].externalImageUrl
     ),
     "photoCount": count(*[_type == "photo" && references(^._id)])
   }
@@ -88,19 +90,65 @@ export const albumBySlugQuery = groq`
     "slug": slug.current,
     "coverUrl": select(
       defined(cover.asset) => cover.asset->url,
-      *[_type == "photo" && references(^._id)] | order(takenAt desc, _createdAt desc)[0].image.asset->url
+      coalesce(
+        *[_type == "photo" && references(^._id)] | order(takenAt desc, _createdAt desc)[0].image.asset->url,
+        *[_type == "photo" && references(^._id)] | order(takenAt desc, _createdAt desc)[0].externalImageUrl
+      )
     ),
     "photos": *[_type == "photo" && references(^._id)] | order(takenAt desc) {
       _id,
       title,
       caption,
       takenAt,
-      "imageUrl": image.asset->url,
+      "imageUrl": coalesce(image.asset->url, externalImageUrl),
       "imageAssetId": image.asset._ref,
       "dimensions": image.asset->metadata.dimensions,
       "lqip": image.asset->metadata.lqip,
       ${uploaderProjection}
     }
+  }
+`;
+
+export function buildPhotosQueries(sort: "asc" | "desc") {
+  const order = sort === "asc" ? "asc" : "desc";
+  const photosQuery = groq`
+    *[_type == "photo"
+      && ($q == "" || title match $q || caption match $q || count(tags[@ match $q]) > 0)
+      && ($albumSlug == "" || album->slug.current == $albumSlug)
+    ] | order(takenAt ${order}, _createdAt ${order}) [$start...$end] {
+      _id,
+      title,
+      caption,
+      takenAt,
+      "imageUrl": coalesce(image.asset->url, externalImageUrl),
+      "dimensions": image.asset->metadata.dimensions,
+      "lqip": image.asset->metadata.lqip,
+      "album": album->{ _id, title, slug },
+      ${uploaderProjection},
+      tags
+    }
+  `;
+  const countQuery = groq`
+    count(*[_type == "photo"
+      && ($q == "" || title match $q || caption match $q || count(tags[@ match $q]) > 0)
+      && ($albumSlug == "" || album->slug.current == $albumSlug)
+    ])
+  `;
+  return { photosQuery, countQuery };
+}
+
+export const heroPhotosQuery = groq`
+  *[_type == "photo" && featuredInHero == true] | order(takenAt desc, _createdAt desc) {
+    _id,
+    title,
+    caption,
+    takenAt,
+    "imageUrl": coalesce(image.asset->url, externalImageUrl),
+    "dimensions": image.asset->metadata.dimensions,
+    "lqip": image.asset->metadata.lqip,
+    "album": album->{ _id, title, slug },
+    ${uploaderProjection},
+    tags
   }
 `;
 

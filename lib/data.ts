@@ -5,7 +5,9 @@ import {
   albumBySlugQuery,
   albumsCountQuery,
   albumsQuery,
+  buildPhotosQueries,
   familyMembersQuery,
+  heroPhotosQuery,
   paginatedAlbumsQuery,
   paginatedPhotosQuery,
   photosCountQuery,
@@ -29,6 +31,21 @@ function normalizePagination(page: number, pageSize: number) {
   const start = (safePage - 1) * safePageSize;
   const end = start + safePageSize;
   return { safePage, safePageSize, start, end };
+}
+
+export async function getHeroPhotos(): Promise<Photo[]> {
+  "use cache";
+  cacheTag("photos");
+  cacheLife("hours");
+
+  const client = getSanityClient();
+  if (!client) return [];
+  try {
+    const photos = await client.fetch<Photo[]>(heroPhotosQuery);
+    return photos ?? [];
+  } catch {
+    return [];
+  }
 }
 
 export async function getPhotos(): Promise<Photo[]> {
@@ -104,6 +121,44 @@ export async function getPhotosPaginated(
         totalPages: 1,
       };
     }
+  }
+}
+
+export async function getPhotosFiltered(
+  page: number,
+  pageSize: number,
+  options: { q?: string; albumSlug?: string; sort?: "asc" | "desc" }
+): Promise<PaginatedResult<Photo>> {
+  "use cache";
+  cacheTag("photos");
+  cacheLife("hours");
+
+  const { q = "", albumSlug = "", sort = "desc" } = options;
+  const { safePage, safePageSize, start, end } = normalizePagination(page, pageSize);
+
+  const client = getSanityClient();
+  if (!client) {
+    return { items: [], total: 0, currentPage: safePage, pageSize: safePageSize, totalPages: 1 };
+  }
+
+  const { photosQuery: filteredQuery, countQuery: filteredCountQuery } = buildPhotosQueries(sort);
+  const params = { q, albumSlug, start, end };
+
+  try {
+    const [items, total] = await Promise.all([
+      client.fetch<Photo[]>(filteredQuery, params),
+      client.fetch<number>(filteredCountQuery, { q, albumSlug }),
+    ]);
+    const totalPages = Math.max(1, Math.ceil((total ?? 0) / safePageSize));
+    return {
+      items: items ?? [],
+      total: total ?? 0,
+      currentPage: Math.min(safePage, totalPages),
+      pageSize: safePageSize,
+      totalPages,
+    };
+  } catch {
+    return { items: [], total: 0, currentPage: safePage, pageSize: safePageSize, totalPages: 1 };
   }
 }
 

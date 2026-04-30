@@ -7,17 +7,25 @@ type PaginationControlsProps = {
   basePath: string;
   currentPage: number;
   totalPages: number;
+  extraParams?: Record<string, string>;
 };
 
-function buildPageHref(basePath: string, page: number) {
-  if (page <= 1) return basePath;
-  return `${basePath}?page=${page}`;
+function buildPageHref(basePath: string, page: number, extraParams?: Record<string, string>) {
+  const params = new URLSearchParams(extraParams);
+  if (page <= 1) {
+    params.delete("page");
+  } else {
+    params.set("page", String(page));
+  }
+  const qs = params.toString();
+  return qs ? `${basePath}?${qs}` : basePath;
 }
 
 export function PaginationControls({
   basePath,
   currentPage,
   totalPages,
+  extraParams,
 }: PaginationControlsProps) {
   if (totalPages <= 1) return null;
 
@@ -36,7 +44,7 @@ export function PaginationControls({
         disabled={currentPage <= 1}
         aria-disabled={currentPage <= 1}
       >
-        <Link href={buildPageHref(basePath, prevPage)}>
+        <Link href={buildPageHref(basePath, prevPage, extraParams)}>
           <ChevronLeft className="size-4" /> Previous
         </Link>
       </Button>
@@ -52,7 +60,7 @@ export function PaginationControls({
         disabled={currentPage >= totalPages}
         aria-disabled={currentPage >= totalPages}
       >
-        <Link href={buildPageHref(basePath, nextPage)}>
+        <Link href={buildPageHref(basePath, nextPage, extraParams)}>
           Next <ChevronRight className="size-4" />
         </Link>
       </Button>

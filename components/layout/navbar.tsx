@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { Menu, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,8 @@ const NavbarAuth = dynamic(
 );
 
 export function Navbar() {
+  const router = useRouter();
+  const desktopSearchRef = useRef<HTMLInputElement>(null);
   const [hidden, setHidden] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -106,8 +109,20 @@ export function Navbar() {
               <div className="relative hidden md:block">
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
+                  ref={desktopSearchRef}
                   placeholder="Search memories…"
                   className="h-9 w-64 pl-9 bg-background/60"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      const value = desktopSearchRef.current?.value.trim() ?? "";
+                      if (value) {
+                        router.push(`/gallery?q=${encodeURIComponent(value)}`);
+                      } else {
+                        router.push("/gallery");
+                      }
+                      if (desktopSearchRef.current) desktopSearchRef.current.value = "";
+                    }
+                  }}
                 />
               </div>
 
